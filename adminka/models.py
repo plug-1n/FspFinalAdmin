@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 from ckeditor_uploader.fields import RichTextUploadingField
@@ -91,3 +91,74 @@ class UserAchieve(models.Model):
 
     def __str__(self):
         return f"{self.achieve_id}"
+    
+class Product(models.Model):
+    name = models.CharField(max_length=50,verbose_name="Название")
+    description = RichTextUploadingField(verbose_name="Описание")
+    price = models.IntegerField(verbose_name="Цена",validators=[
+        MinValueValidator(0,"Цена не может быть отрицательной")
+    ])
+    url = models.CharField(max_length=255,verbose_name="S3 картинка")
+
+    class Meta:
+        verbose_name = "Товар"
+        verbose_name_plural = "Товары"
+
+    def __str__(self):
+        return f"{self.name}"
+
+class Course(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Название")
+    description = RichTextUploadingField(verbose_name="Описание")
+    # course_age у нас в качестве уровня сложности
+    course_age = models.IntegerField(verbose_name="Сложность [0;2]", validators=[
+        MinValueValidator(0,message="Диапозон должен быть в диапозоне от 0 до 2"),
+        MaxValueValidator(2,message="Диапозон должен быть в диапозоне от 0 до 2"),
+    ])
+    url = models.CharField(max_length=255, verbose_name="S3 картинка")
+
+    class Meta:
+        verbose_name = "Курс"
+        verbose_name_plural = "Курсы"
+    
+    def __str__(self):
+        return f"{self.name}"
+
+class LessonType(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Название")
+
+    class Meta:
+        verbose_name = "Тип урока"
+        verbose_name_plural = "Типы уроков"
+    
+    def __str__(self):
+        return f"{self.name}"
+    
+class Lesson(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Название")
+    lesson_type = models.ForeignKey(LessonType,verbose_name="Тип урока",on_delete=models.CASCADE)
+    course_id = models.ForeignKey(Course, verbose_name="Курс", on_delete=models.CASCADE)
+    value = models.IntegerField(verbose_name="Кол-во поинтов за курс", validators=[
+        MinValueValidator(0,message="Значение должно быть больше или равно 0")
+    ])
+
+    class Meta:
+        verbose_name = "Урок"
+        verbose_name_plural = "Уроки"
+    
+    def __str__(self):
+        return f"{self.name}"
+
+class UserLesson(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Название")
+    lesson_id = models.ForeignKey(Lesson,verbose_name="Урок",on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, verbose_name="Юзер", on_delete=models.CASCADE)
+    finish = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = "Юзер-Урок"
+        verbose_name_plural = "Юзер-Урок"
+    
+    def __str__(self):
+        return f"{self.name}"
+    
