@@ -6,8 +6,6 @@ from ckeditor_uploader.fields import RichTextUploadingField
 
 
 class UserManager(BaseUserManager):
-    """ User Manager that knows how to create users via email instead of username """
-
     def _create_user(self, email, password, **extra_fields):
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
@@ -38,7 +36,7 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=150, verbose_name='Фамилия')
     email = models.EmailField(null=False, unique=True, verbose_name='Почта')
     phone = models.CharField(max_length=20, null=False,
-                             unique=True, verbose_name="номер телефона")
+                             unique=True, verbose_name="Номер телефона")
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -64,7 +62,7 @@ class ForwardSrc(models.Model):
 
     class Meta:
         verbose_name = "Угроза->статика"
-        verbose_name_plural = "Угрозы->статика"
+        verbose_name_plural = "Угроза->статика"
     def __str__(self):
         return f"{self.forward_id}"
 
@@ -82,4 +80,14 @@ class Achieve(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+    
+class UserAchieve(models.Model):
+    achieve_id = models.ForeignKey(Achieve, verbose_name="Достижение", on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, verbose_name="Пользователь", on_delete=models.CASCADE)
 
+    class Meta:
+        verbose_name = "Юзер-Достижение"
+        verbose_name_plural = "Юзер-Достижение"
+
+    def __str__(self):
+        return f"{self.achieve_id}"

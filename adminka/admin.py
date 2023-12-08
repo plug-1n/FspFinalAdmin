@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Forward, ForwardSrc, Achieve, User
+from .models import Forward, ForwardSrc, Achieve, User, UserAchieve
 
 @admin.register(ForwardSrc)
 class ForwardSrcAdmin(admin.ModelAdmin):
@@ -14,6 +14,10 @@ class AchieveAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ("id","email")
+    list_display = ("id","email", "is_staff")
+
+@admin.register(UserAchieve)
+class UserAchieveAdmin(admin.ModelAdmin):
+    list_display = ("id","user_id","achieve_id")
 
 admin.site.site_header = 'Админка'
