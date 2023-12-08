@@ -1,5 +1,8 @@
 from django.contrib import admin
-from .models import Forward, ForwardSrc, Achieve, User, UserAchieve, Product, Course, LessonType, Lesson, UserLesson
+from .models import Achieve, Product, Course, LessonType, Lesson, UserLesson, LessonMat, LessonMatSrc
+from .models import Forward, ForwardSrc
+from .models import User, UserAchieve
+
 
 @admin.register(ForwardSrc)
 class ForwardSrcAdmin(admin.ModelAdmin):
@@ -38,7 +41,15 @@ class LessonAdmin(admin.ModelAdmin):
     list_display = ("id","name","lesson_type","course_id","value")
 
 @admin.register(UserLesson)
-class LessonAdmin(admin.ModelAdmin):
+class UserLessonAdmin(admin.ModelAdmin):
     list_display = ("id","name","lesson_id","user_id","finish")
+
+@admin.register(LessonMat)
+class LessonMatAdmin(admin.ModelAdmin):
+    list_display = ("id","name","lesson_id")
+
+@admin.register(LessonMatSrc)
+class LessonMatAdmin(admin.ModelAdmin):
+    list_display = ("id","name","lesson_mat_id")
 
 admin.site.site_header = 'Админка'

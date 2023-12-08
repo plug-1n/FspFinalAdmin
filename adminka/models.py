@@ -50,8 +50,8 @@ class Forward(models.Model):
 
 
     class Meta:
-        verbose_name = "Угроза"
-        verbose_name_plural = "Угрозы"
+        verbose_name = "Вид угрозы"
+        verbose_name_plural = "Виды угроз"
 
     def __str__(self):
         return f"{self.name}"
@@ -61,8 +61,8 @@ class ForwardSrc(models.Model):
     url = models.CharField(max_length=255, verbose_name="Ссылка")
 
     class Meta:
-        verbose_name = "Угроза->статика"
-        verbose_name_plural = "Угроза->статика"
+        verbose_name = "Угроза -> media"
+        verbose_name_plural = "Угроза -> media"
     def __str__(self):
         return f"{self.forward_id}"
 
@@ -161,4 +161,27 @@ class UserLesson(models.Model):
     
     def __str__(self):
         return f"{self.name}"
+
+class LessonMat(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Название")
+    lesson_id = models.ForeignKey(Lesson,verbose_name="Урок",on_delete=models.CASCADE)
+    lesson_text = RichTextUploadingField(verbose_name="Текст")
+
+    class Meta:
+        verbose_name = "Материал урока"
+        verbose_name_plural = "Материалы урока"
     
+    def __str__(self):
+        return f"{self.name}"
+
+class LessonMatSrc(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Название")
+    lesson_mat_id = models.ForeignKey(LessonMat,verbose_name="Материал урока",on_delete=models.CASCADE)
+    url = models.CharField(max_length=255, verbose_name="S3 картинка")
+
+    class Meta:
+        verbose_name = "Материал урока -> media"
+        verbose_name_plural = "Материал урока -> media"
+    
+    def __str__(self):
+        return f"{self.name}"
