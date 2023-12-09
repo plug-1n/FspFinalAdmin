@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import  Achieve, Product, Course, Role
+from .models import  Achieve, Product, Course, Role, News
 from .models import LessonType, Lesson, UserLesson, LessonMat, LessonMatSrc, LessonTest
 from .models import LessonTestQuestionType, LessonTestQuestion, LessonTestAnswer, LessonTestAnswerSrc
 from .models import Forward, ForwardSrc
@@ -45,7 +45,7 @@ class LessonAdmin(admin.ModelAdmin):
 
 @admin.register(UserLesson)
 class UserLessonAdmin(admin.ModelAdmin):
-    list_display = ("id","name","lesson_id","user_id","finish")
+    list_display = ("id","lesson_id","user_id","finish")
 
 @admin.register(LessonMat)
 class LessonMatAdmin(admin.ModelAdmin):
@@ -53,7 +53,7 @@ class LessonMatAdmin(admin.ModelAdmin):
 
 @admin.register(LessonMatSrc)
 class LessonMatAdmin(admin.ModelAdmin):
-    list_display = ("id","name","lesson_mat_id")
+    list_display = ("id","lesson_mat_id","url")
 
 
 @admin.register(LessonTest)
@@ -67,11 +67,11 @@ class LessonTestQuestionTypeAdmin(admin.ModelAdmin):
 
 @admin.register(LessonTestQuestion)
 class LessonTestQuestionAdmin(admin.ModelAdmin):
-    list_display = ("id","name","lesson_id","lesson_test_question_type_id")
+    list_display = ("id","question","lesson_id","lesson_test_question_type_id")
 
 @admin.register(LessonTestAnswer)
 class LessonTestAnswerAdmin(admin.ModelAdmin):
-    list_display = ("id","lesson_test_question_id","right")
+    list_display = ("id","lesson_test_question_id","correct")
 
 @admin.register(LessonTestAnswerSrc)
 class LessonTestAnswerSrcAdmin(admin.ModelAdmin):
@@ -80,5 +80,12 @@ class LessonTestAnswerSrcAdmin(admin.ModelAdmin):
 @admin.register(Role)
 class RoleAdmin(admin.ModelAdmin):
     list_display = ("id","name")
+
+
+@admin.register(News)
+class NewsAdmin(admin.ModelAdmin):
+    list_display = ("id","title","creation_datetime")
+
+
 
 admin.site.site_header = 'Админка'
