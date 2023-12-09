@@ -4,8 +4,23 @@ from .models import LessonType, Lesson, UserLesson, LessonMat, LessonMatSrc, Les
 from .models import LessonTestQuestionType, LessonTestQuestion, LessonTestAnswer, LessonTestAnswerSrc
 from .models import Forward, ForwardSrc
 from .models import CustomUser, UserAchieve
+from .models import FinalTest,UserFinal,FinalTestQuestionDirection,FinalTestQuestion,FinalTestAnswer
 
-
+@admin.register(FinalTest)
+class FinalTestAdmin(admin.ModelAdmin):
+    list_display = ("id","test_description")
+@admin.register(UserFinal)
+class UserFinalAdmin(admin.ModelAdmin):
+    list_display = ("id","final_test_id","user_id","max_result","last_result")
+@admin.register(FinalTestQuestionDirection)
+class FinalTestQuestionDirectionAdmin(admin.ModelAdmin):
+    list_display = ("id","name")
+@admin.register(FinalTestQuestion)
+class FinalTestQuestionAdmin(admin.ModelAdmin):
+    list_display = ("id","final_test_question_direction_id","question","url")
+@admin.register(FinalTestAnswer)
+class FinalTestAnswerAdmin(admin.ModelAdmin):
+    list_display = ("id","answer_text","url")
 
 @admin.register(ForwardSrc)
 class ForwardSrcAdmin(admin.ModelAdmin):

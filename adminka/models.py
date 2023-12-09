@@ -344,3 +344,80 @@ class News(models.Model):
     
     def __str__(self):
         return f"{self.title}"
+    
+class FinalTest(models.Model):
+    test_description = RichTextUploadingField(verbose_name="Описание")
+
+    class Meta:
+        verbose_name = "Финальный тест"
+        verbose_name_plural = "Финальный тест"
+
+        managed = False
+        db_table = "final_test"
+
+    def __str__(self):
+        return f"{self.test_description}"
+
+class UserFinal(models.Model):
+    final_test_id = models.ForeignKey(FinalTest, on_delete=models.CASCADE, db_column="final_test_id", verbose_name="Тест")
+    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE, db_column="user_id", verbose_name="Пользователь")
+    max_result = models.IntegerField(verbose_name="Максимальный результат", validators=[
+        MinValueValidator(0,message="Значение должно быть больше или равно 0")
+    ])
+    last_result = models.IntegerField(verbose_name="Последний резульатт", validators=[
+        MinValueValidator(0,message="Значение должно быть больше или равно 0")
+    ])
+
+    class Meta:
+        verbose_name = "Юзер -> финал"
+        verbose_name_plural = "Юзер -> финал"
+
+        managed = False
+        db_table = "user_final"
+    
+    def __str__(self):
+        return f"{self.final_test_id} - {self.user_id}"
+    
+class FinalTestQuestionDirection(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Название")
+
+    class Meta:
+        verbose_name = "Финал -> direction"
+        verbose_name_plural = "Финал -> direction"
+
+        managed = False
+        db_table = "final_test_question_direction"
+    
+    def __str__(self):
+        return f"{self.name}"
+
+
+class FinalTestQuestion(models.Model):
+    final_test_question_direction_id = models.ForeignKey(FinalTestQuestionDirection,
+                                                        on_delete=models.CASCADE,
+                                                        db_column="final_test_question_direction_id",
+                                                        verbose_name="Финал -> direction")
+    url = models.CharField(max_length=255,verbose_name="S3 картинка")
+    question = models.CharField(max_length=255,verbose_name="Вопрос")
+    class Meta:
+        verbose_name = "Финал -> question"
+        verbose_name_plural = "Финал -> question"
+
+        managed = False
+        db_table = "final_test_question"
+    
+    def __str__(self):
+        return f"{self.question}"
+
+class FinalTestAnswer(models.Model):
+    answer_text = RichTextUploadingField(verbose_name="Текст ответа")
+    url = models.CharField(max_length=255,verbose_name="S3 картинка")
+    final_test_question_id = models.ForeignKey(FinalTestQuestion,
+                                               on_delete=models.CASCADE,
+                                               db_column="final_test_question_id",
+                                               verbose_name="Финал -> question")   
+    class Meta:
+        verbose_name = "Финал -> answer"
+        verbose_name_plural = "Финал -> answer"
+        managed = False
+        db_table = "final_test_answer"
