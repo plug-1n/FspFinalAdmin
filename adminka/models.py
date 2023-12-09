@@ -5,44 +5,69 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from ckeditor_uploader.fields import RichTextUploadingField
 
 
-class UserManager(BaseUserManager):
-    def _create_user(self, email, password, **extra_fields):
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
+class Role(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Название")
 
-    def create_superuser(self, email=None, password=None, **extra_fields):
-        extra_fields.setdefault("is_staff", True)
-        extra_fields.setdefault("is_superuser", True)
+    class Meta:
+        verbose_name = "Роль"
+        verbose_name_plural = "Роли"
+    
+    def __str__(self):
+        return f"{self.name}"
 
-        if extra_fields.get("is_staff") is not True:
-            raise ValueError("Superuser must have is_staff=True.")
-        if extra_fields.get("is_superuser") is not True:
-            raise ValueError("Superuser must have is_superuser=True.")
+# class UserManager(BaseUserManager):
+#     def _create_user(self, email, password, **extra_fields):
+#         email = self.normalize_email(email)
+#         user = self.model(email=email, **extra_fields)
+#         user.set_password(password)
+#         user.save(using=self._db)
+#         return user
 
-        return self._create_user(email, password, **extra_fields)
+#     def create_superuser(self, email=None, password=None, **extra_fields):
+#         extra_fields.setdefault("is_staff", True)
+#         extra_fields.setdefault("is_superuser", True)
 
-    def create_user(self, email=None, password=None, **extra_fields):
-        extra_fields.setdefault("is_staff", False)
-        extra_fields.setdefault("is_superuser", False)
-        return self._create_user(email, password, **extra_fields)
+#         if extra_fields.get("is_staff") is not True:
+#             raise ValueError("Superuser must have is_staff=True.")
+#         if extra_fields.get("is_superuser") is not True:
+#             raise ValueError("Superuser must have is_superuser=True.")
 
+#         return self._create_user(email, password, **extra_fields)
 
-class User(AbstractUser):
-    username = None
-    first_name = models.CharField(max_length=150, verbose_name='Имя')
-    last_name = models.CharField(max_length=150, verbose_name='Фамилия')
-    email = models.EmailField(null=False, unique=True, verbose_name='Почта')
-    phone = models.CharField(max_length=20, null=False,
-                             unique=True, verbose_name="Номер телефона")
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
-    objects = UserManager()
+#     def create_user(self, email=None, password=None, **extra_fields):
+#         extra_fields.setdefault("is_staff", False)
+#         extra_fields.setdefault("is_superuser", False)
+#         return self._create_user(email, password, **extra_fields)
 
 
+# class User(AbstractUser):
+#     username = None
+
+#     email = models.EmailField(null=False, unique=True, verbose_name='Почта')
+
+
+#     USERNAME_FIELD = 'email'
+#     REQUIRED_FIELDS = []
+#     objects = UserManager()
+
+class CustomUser(models.Model):
+    email = models.EmailField(max_length=250,verbose_name="Почта")
+    role_id = models.ForeignKey(Role, on_delete=models.CASCADE, verbose_name="Роль")
+    password_hash = models.CharField(max_length=255,verbose_name="Хэш пароля")
+    age = models.IntegerField(verbose_name="Возраст", validators=[
+        MinValueValidator(6, "Возраст должнен быть от 6 до 100"),
+        MaxValueValidator(100, "Возраст должнен быть от 6 до 100")
+    ])
+    refresh = models.CharField(max_length=100, verbose_name="Рефреш")
+    total_points = models.IntegerField(verbose_name="Общее кол-во очков")
+    final_exam_current = models.IntegerField(verbose_name="Текущий бал за тест")
+    final_exam_max = models.IntegerField(verbose_name="Лучшее решение теста") 
+    expired_at = models.DateTimeField(blank=True, null=True)
+    registration_datetime = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользовталели"
 class Forward(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название")
     forward_text = RichTextUploadingField(verbose_name="Описание")
@@ -83,7 +108,7 @@ class Achieve(models.Model):
     
 class UserAchieve(models.Model):
     achieve_id = models.ForeignKey(Achieve, verbose_name="Достижение", on_delete=models.CASCADE)
-    user_id = models.ForeignKey(User, verbose_name="Пользователь", on_delete=models.CASCADE)
+    user_id = models.ForeignKey(CustomUser, verbose_name="Пользователь", on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = "Юзер-Достижение"
@@ -152,7 +177,7 @@ class Lesson(models.Model):
 class UserLesson(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название")
     lesson_id = models.ForeignKey(Lesson,verbose_name="Урок",on_delete=models.CASCADE)
-    user_id = models.ForeignKey(User, verbose_name="Юзер", on_delete=models.CASCADE)
+    user_id = models.ForeignKey(CustomUser, verbose_name="Юзер", on_delete=models.CASCADE)
     finish = models.BooleanField(default=False)
 
     class Meta:
@@ -165,11 +190,11 @@ class UserLesson(models.Model):
 class LessonMat(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название")
     lesson_id = models.ForeignKey(Lesson,verbose_name="Урок",on_delete=models.CASCADE)
-    lesson_text = RichTextUploadingField(verbose_name="Текст")
+    lesson_text = RichTextUploadingField(null=True, verbose_name="Текст")
 
     class Meta:
-        verbose_name = "Материал урока"
-        verbose_name_plural = "Материалы урока"
+        verbose_name = "Урок -> material"
+        verbose_name_plural = "Урок -> material"
     
     def __str__(self):
         return f"{self.name}"
@@ -180,8 +205,65 @@ class LessonMatSrc(models.Model):
     url = models.CharField(max_length=255, verbose_name="S3 картинка")
 
     class Meta:
-        verbose_name = "Материал урока -> media"
-        verbose_name_plural = "Материал урока -> media"
+        verbose_name = "Урок -> media"
+        verbose_name_plural = "Урок -> media"
     
     def __str__(self):
         return f"{self.name}"
+    
+class LessonTest(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Название")
+    lesson_id = models.ForeignKey(Lesson,verbose_name="Урок",on_delete=models.CASCADE)
+    lesson_text = RichTextUploadingField(null=True, verbose_name="Текст")
+
+    class Meta:
+        verbose_name = "Урок -> test"
+        verbose_name_plural = "Урок -> test"
+    
+    def __str__(self):
+        return f"{self.name}"
+
+class LessonTestQuestionType(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Название")
+
+    class Meta:
+        verbose_name = "Вид вопроса"
+        verbose_name_plural = "Виды вопросов"
+    
+    def __str__(self):
+        return f"{self.name}"
+
+class LessonTestQuestion(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Название")
+    lesson_id = models.ForeignKey(Lesson,on_delete=models.CASCADE, verbose_name="Задание")
+    lesson_test_question_type_id = models.ForeignKey(LessonTestQuestionType, on_delete=models.CASCADE, verbose_name="Тип задания")
+
+    class Meta:
+        verbose_name = "Тест -> question"
+        verbose_name_plural = "Тест -> question"
+    
+    def __str__(self):
+        return f"{self.name}"
+
+class LessonTestAnswer(models.Model):
+    answer_text = RichTextUploadingField(verbose_name="Текст ответа")
+    lesson_test_question_id = models.ForeignKey(LessonTestQuestion,on_delete=models.CASCADE, verbose_name="Вопрос")
+    right = models.BooleanField()
+
+    class Meta:
+        verbose_name = "Тест -> answer"
+        verbose_name_plural = "Тест -> answer"
+    
+    def __str__(self):
+        return f"{self.name}"
+
+class LessonTestAnswerSrc(models.Model):
+    lesson_test_answer_id = models.ForeignKey(LessonTestAnswer,on_delete=models.CASCADE,verbose_name="Ответ вопроса")
+    url = models.CharField(max_length=255, verbose_name="S3 картинка")
+
+    class Meta:
+        verbose_name = "Ответ -> media"
+        verbose_name_plural = "Ответ -> media"
+    
+    def __str__(self):
+        return f"{self.lesson_test_answer_id}"
