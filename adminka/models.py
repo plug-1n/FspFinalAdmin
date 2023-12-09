@@ -331,7 +331,7 @@ class LessonTestAnswerSrc(models.Model):
 class News(models.Model):
     title = models.CharField(max_length=50,verbose_name="Заголовок")
     news_text = RichTextUploadingField()
-    creation_datetime = models.DateTimeField(auto_now=True)
+    creation_datetime = models.DateTimeField(auto_now=True, verbose_name="Дата создания")
     url_image = models.CharField(max_length=255)
     url_video = models.CharField(max_length=255)
 

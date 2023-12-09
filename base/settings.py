@@ -146,4 +146,8 @@ CKEDITOR_CONFIGS = {
         ]
     }
 }
+JAZZMIN_UI_TWEAKS = {
+    "theme": "simplex",
+    "dark_mode_theme": "darkly",
+}
 #AUTH_USER_MODEL = 'adminka.User'
