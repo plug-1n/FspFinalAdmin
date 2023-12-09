@@ -110,7 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'ru'
+LANGUAGE_CODE = 'en'
 
 TIME_ZONE = 'UTC'
 
@@ -147,7 +147,7 @@ CKEDITOR_CONFIGS = {
     }
 }
 JAZZMIN_UI_TWEAKS = {
-    "theme": "simplex",
-    "dark_mode_theme": "darkly",
+    "theme": "pulse",
+    "dark_mode_theme": "solar",
 }
 #AUTH_USER_MODEL = 'adminka.User'
