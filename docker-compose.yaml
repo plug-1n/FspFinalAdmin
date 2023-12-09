@@ -11,4 +11,16 @@ services:
       POSTGRES_USER: "postgres"
       PGDATA: "/var/lib/postgresql/data/pgdata"
 
+minio:
+    image: minio/minio
+    hostname: "minio"
+    volumes:
+      - ./minio:/minio_files
+    env_file:
+      - minio.env
+    command: 'minio server /minio_files --console-address ":9001"'
+    ports:
+      - 9000:9000
+      - 9001:9001
+
   
